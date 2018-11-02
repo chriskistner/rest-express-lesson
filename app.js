@@ -1,11 +1,11 @@
-const express = require('express')
-const bodyParser = require('body-parser')
-const morgan = require('morgan')
-const app = express()
-const port = 3000
+const express = require('express');
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
+const app = express();
+const port = 3000;
 
-app.use(morgan('dev'))
-app.use(bodyParser.json())
+app.use(morgan('dev'));
+app.use(bodyParser.json());
 
 const authors = [
   {
@@ -22,6 +22,33 @@ const authors = [
     ]
   }
 ]
+
+app.get('/authors', (req, res) => {
+  res.send(authors);
+  
+}) 
+
+app.get('/authors/:id', (req, res, next) => {
+  const id = Number(req.params.id);
+  if (!authors[id]) {
+    next({ status: 404, message: "Author Doesn't Exist." })
+  } else {
+    res.send(authors[id])}
+}); 
+app.use((err, req, res, next) => {
+  console.log(err)
+  res.status(err.status).json({ error: err })
+});
+
+app.post('/authors', (req, res, next)=> {
+  const {name} = req.body;
+  if (!name) {
+    next({status: 400, message: "Hey, Where's your Author's name?"})
+  } else {
+    authors.push({name})
+      res.status(201).send(authors);
+    }
+})
 
 /* Add RESTful routes for the following:
 
